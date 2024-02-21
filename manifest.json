@@ -1,0 +1,22 @@
+{
+    "name": "Parking Ticket Automator",
+    "version": "1.0.0",
+    "description": "Automating ticket printing instead of writing them. Made for quality inn hotel.",
+    "manifest_version": 3,
+    "author": "Emre Kuru",
+    "action":{
+        "default_popup": "popup.html",
+        "default_title": "Parking Ticket Automator"
+    },
+    "permissions": ["tabs", "activeTab", "storage", "background", "scripting"],
+    "content_scripts": [
+        {
+          "js": ["content.js"],
+          "matches": ["https://www.choiceadvantage.com/*"]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    }
+
+}
