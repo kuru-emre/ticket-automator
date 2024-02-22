@@ -1,7 +1,5 @@
 console.log('background.js is running...');
 
-let tickets = [];
-
 // Listen for messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.data) {
@@ -21,8 +19,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     console.error('Error setting data:', chrome.runtime.lastError.message);
                 } else {
                     console.log('Data saved to Chrome storage');
-                    // Add to an arrray for reference
-                    tickets.push(message.data);
                 }
             });
         });
