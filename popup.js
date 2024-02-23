@@ -3,7 +3,7 @@ const CONVERSION = 0.665;
 const PDF = {
     height: document.getElementById("ticket").clientHeight * CONVERSION, // convert to points from pixels
     width: document.getElementById("ticket").clientWidth * CONVERSION, // convert to points from pixels
-    templatePath: "./template_fillable.pdf"
+    templatePath: "./template_fillable_big.pdf"
 }
 
 function updateTable(data) {
@@ -52,56 +52,31 @@ function filterGSA(gsa) {
 
 }
 
-async function pdfTemplate(template, data) {
+async function createPDF(template, data) {
     const pdfBytes = await fetch(template).then(res => res.arrayBuffer());
     const pdfDoc = await PDFDocument.load(pdfBytes)
     const form = pdfDoc.getForm()
+    const page = pdfDoc.getPage(0);
 
     Object.entries(data).forEach(([key, value]) => {
-        form.getTextField(key).setText(value)
+        const textField = form.getTextField(key);
+        textField.setText(value)
     });
 
-    const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
-    document.getElementById('ticket').src = pdfDataUri;
-
-
-
-}
-
-
-async function createPdf(template) {
-    const pdfBytes = await fetch(template).then(res => res.arrayBuffer());
-    const pdfTemplate = await PDFDocument.load(pdfBytes);
-    const pdfDoc = await PDFDocument.create();
-
-    const copiedPages = await pdfDoc.copyPages(pdfTemplate, [0]); // Change the page number as per your requirement
-
-    copiedPages.forEach((page) => {
-        pdfDoc.addPage(page, [PDF.width, PDF.height])
-    });
-
-
-
-
-    // const page = pdfDoc.addPage([pdf.width, pdf.height]);
-    // page.moveTo(110, 200);
-    // page.drawText('Hello World!');
+    page.scaleContent(0, 0);
+    page.setRotation(degrees(180))
+    pdfDoc.removePage(0);
+    pdfDoc.addPage(page)
 
 
     const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
     document.getElementById('ticket').src = pdfDataUri;
-
 }
-
 
 
 chrome.storage.local.get("data", (result) => {
     let data = filterAllData(result.data);
     updateTable(data);
-
-
-    document.getElementById('printBtn'); addEventListener('click', async function () {
-        await pdfTemplate(PDF.templatePath, data);
-    });
+    createPDF(PDF.templatePath, data)
 
 });
